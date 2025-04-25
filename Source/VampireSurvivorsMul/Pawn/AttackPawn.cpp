@@ -4,7 +4,7 @@
 #include "Pawn/AttackPawn.h"
 
 #include "InputActionValue.h"
-#include "InputMappingContext.h"
+
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -16,17 +16,27 @@ AAttackPawn::AAttackPawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> AttackActionObj(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Action/IA_Attack.IA_Attack'"));
+	if (AttackActionObj.Succeeded())
+	{
+		AttackAction = AttackActionObj.Object;
+	}
+
+
 }
 
 // Called when the game starts or when spawned
 void AAttackPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	FTimerHandle TryHandle;
-	GetWorld()->GetTimerManager().SetTimer(TryHandle, FTimerDelegate::CreateUObject(this, &AAttackPawn::AddInputMappingContext), 0.1f, false);
-
 	StartAttacking();
+}
+
+void AAttackPawn::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
 }
 
 // Called every frame
@@ -47,34 +57,6 @@ void AAttackPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
-
-void AAttackPawn::AddInputMappingContext()
-{
-	if (!IsLocallyControlled())
-	{
-		return;
-	}
-
-	APlayerController* PC = Cast<APlayerController>(GetController());
-
-	if (!PC)
-	{
-		FTimerHandle ReTryHandle;
-		GetWorld()->GetTimerManager().SetTimer(ReTryHandle, FTimerDelegate::CreateUObject(this, &AAttackPawn::AddInputMappingContext), 0.1f, false);
-		return;
-	}
-
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-
-	if (!Subsystem)
-	{
-		FTimerHandle ReTryHandle;
-		GetWorld()->GetTimerManager().SetTimer(ReTryHandle, FTimerDelegate::CreateUObject(this, &AAttackPawn::AddInputMappingContext), 0.1f, false);
-		return;
-	}
-
-	Subsystem->AddMappingContext(AttackMappingContext, 0);
-}
 
 void AAttackPawn::StartAttacking()
 {

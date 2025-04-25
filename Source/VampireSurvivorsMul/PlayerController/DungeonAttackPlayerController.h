@@ -14,7 +14,15 @@ class VAMPIRESURVIVORSMUL_API ADungeonAttackPlayerController : public ADungeonPl
 {
 	GENERATED_BODY()
 	
+public:
+	ADungeonAttackPlayerController();
+
 protected:
 	virtual void BeginPlay() override;
-	
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputMappingContext> AttackMappingContext;
+
+	void AddInputMappingContext();
 };

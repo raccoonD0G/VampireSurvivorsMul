@@ -20,6 +20,8 @@ void ACharacterBase::PostInitializeComponents()
 
 	CharacterStatComponent = GetComponentByClass<UCharacterStatComponent>();
 
+	check(CharacterStatComponent);
+
 	if (CharacterStatComponent)
 	{
 		CharacterStatComponent->OnHpZero.AddUObject(this, &ACharacterBase::OnHpZero);

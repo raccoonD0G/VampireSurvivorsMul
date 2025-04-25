@@ -5,10 +5,15 @@
 #include "HttpModule.h"
 #include "Json.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameUserSettings.h"
 
 void UVSGameInstance::Init()
 {
 	Super::Init();
+    UGameUserSettings* Settings = GEngine->GetGameUserSettings();
+    Settings->SetScreenResolution(FIntPoint(1280, 720));
+    Settings->SetFullscreenMode(EWindowMode::Windowed);
+    Settings->ApplySettings(false);
 }
 
 void UVSGameInstance::RequestJoinMatch()

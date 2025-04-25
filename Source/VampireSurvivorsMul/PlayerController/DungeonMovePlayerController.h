@@ -14,4 +14,18 @@ class VAMPIRESURVIVORSMUL_API ADungeonMovePlayerController : public ADungeonPlay
 {
 	GENERATED_BODY()
 	
+public:
+	ADungeonMovePlayerController();
+
+protected:
+	virtual void BeginPlay() override;
+protected:
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputMappingContext> MoveMappingContext;
+
+private:
+	UFUNCTION()
+	void AddInputMappingContext();
+
+	
 };

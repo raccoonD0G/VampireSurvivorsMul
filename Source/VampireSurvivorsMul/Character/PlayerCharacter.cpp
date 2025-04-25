@@ -20,15 +20,26 @@ APlayerCharacter::APlayerCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f); //
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionObj(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Action/IA_Move.IA_Move'"));
+	if (MoveActionObj.Succeeded())
+	{
+		MoveAction = MoveActionObj.Object;
+	}
+
+
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	FTimerHandle TryHandle;
-	GetWorld()->GetTimerManager().SetTimer(TryHandle, FTimerDelegate::CreateUObject(this, &APlayerCharacter::AddInputMappingContext), 0.1f, false);
+
+}
+
+void APlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
 
 }
 
@@ -49,40 +60,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleMove);
 	}
 
-}
-
-void APlayerCharacter::AddInputMappingContext()
-{
-	if (!IsLocallyControlled())
-	{
-		return;
-	}
-
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (!PC)
-	{
-		FTimerHandle RetryHandle;
-		GetWorld()->GetTimerManager().SetTimer(RetryHandle, FTimerDelegate::CreateUObject(this, &APlayerCharacter::AddInputMappingContext), 0.1f, false);
-		return;
-	}
-
-	ULocalPlayer* LocalPlayer = PC->GetLocalPlayer();
-	if (!LocalPlayer)
-	{
-		FTimerHandle RetryHandle;
-		GetWorld()->GetTimerManager().SetTimer(RetryHandle, FTimerDelegate::CreateUObject(this, &APlayerCharacter::AddInputMappingContext), 0.1f, false);
-		return;
-	}
-
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
-	if (!Subsystem)
-	{
-		FTimerHandle RetryHandle;
-		GetWorld()->GetTimerManager().SetTimer(RetryHandle, FTimerDelegate::CreateUObject(this, &APlayerCharacter::AddInputMappingContext), 0.1f, false);
-		return;
-	}
-
-	Subsystem->AddMappingContext(MoveMappingContext, 0);
 }
 
 
